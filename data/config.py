@@ -54,6 +54,10 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
 
+CUSTOM_COCO_CLASSES = ('valve', 'manometer', 'hole')
+
+CUSTOM_COCO_LABEL_MAP = {1: 1, 2: 2, 3: 3}
+
 
 
 # ----------------------- CONFIG CLASS ----------------------- #
@@ -153,6 +157,20 @@ coco2017_testdev_dataset = dataset_base.copy({
     'has_gt': False,
 
     'label_map': COCO_LABEL_MAP
+})
+
+dataset_custom = dataset_base.copy({
+    'name': 'Custom Dataset',
+
+    'train_images': './data/coco/images/',
+    'train_info':   './data/coco/train.json',
+
+    # Validation images and annotations.
+    'valid_images': './data/coco/images/',
+    'valid_info':   './data/coco/valid.json',
+
+    'class_names': CUSTOM_COCO_CLASSES,
+    'label_map': CUSTOM_COCO_LABEL_MAP
 })
 
 PASCAL_CLASSES = ("aeroplane", "bicycle", "bird", "boat", "bottle",
@@ -789,6 +807,30 @@ yolact_plus_base_config = yolact_base_config.copy({
     'rescore_mask': True,
 
     'discard_mask_area': 5*5,
+})
+
+custom_yolact_plus_101_config = yolact_base_config.copy({
+    'name': 'yolact_plus_base',
+    'dataset': dataset_custom,
+
+    'backbone': resnet101_dcn_inter3_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+
+        'pred_aspect_ratios': [[[1, 1 / 2, 2]]] * 5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+
+    'use_maskiou': True,
+    'maskiou_net': [(8, 3, {'stride': 2}), (16, 3, {'stride': 2}), (32, 3, {'stride': 2}), (64, 3, {'stride': 2}),
+                    (128, 3, {'stride': 2})],
+    'maskiou_alpha': 25,
+    'rescore_bbox': False,
+    'rescore_mask': True,
+
+    'discard_mask_area': 5 * 5,
 })
 
 yolact_plus_resnet50_config = yolact_plus_base_config.copy({
