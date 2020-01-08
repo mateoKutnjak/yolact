@@ -812,6 +812,7 @@ yolact_plus_base_config = yolact_base_config.copy({
 custom_yolact_plus_101_config = yolact_base_config.copy({
     'name': 'yolact_plus_base',
     'dataset': dataset_custom,
+    'num_classes': len(dataset_custom.class_names) + 1,
 
     'backbone': resnet101_dcn_inter3_backbone.copy({
         'selected_layers': list(range(1, 4)),
@@ -830,7 +831,7 @@ custom_yolact_plus_101_config = yolact_base_config.copy({
     'rescore_bbox': False,
     'rescore_mask': True,
 
-    'discard_mask_area': 5 * 5,
+    'discard_mask_area': 2,
 })
 
 yolact_plus_resnet50_config = yolact_plus_base_config.copy({
