@@ -1,0 +1,58 @@
+version: 1
+
+kind: experiment
+
+inputs:
+  - name: batch_size
+    is_optional: true
+    default: 8
+    type: int
+#  - name: resume
+#    is_optional: true
+#    default: ""
+#    type: str
+#  - name: num_workers
+#    is_optional: true
+#    default: 6
+#    type: int
+  - name: config
+    is_optional: true
+    default: "custom_yolact_plus_101_config_polyaxon"
+    type: str
+#  - name: save_interval
+#    is_optional: true
+#    default: 1000
+#    type: int
+#  - name: lr
+#    is_optional: true
+#    default: 0.001
+#    type: float
+#  - name: validation_size
+#    is_optional: true
+#    default: 5000
+#    type: int
+#  - name: validation_epoch
+#    is_optional: true
+#    default: 2
+#    type: int
+#  - name: dataset
+#    is_optional: true
+#    default: "custom_dataset_polyaxon"
+#    type: str
+
+environment:
+  node_selector:
+    polyaxon: ali
+  resources:
+    gpu:
+      requests: 1
+      limits: 1
+
+build:
+  dockerfile: ./Dockerfile-polyaxon
+
+run:
+  cmd:
+    - python3 -W ignore train_polyaxon.py \
+      --config {{config}} \
+      --batch_size {{batch_size}}
