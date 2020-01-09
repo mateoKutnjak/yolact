@@ -53,7 +53,7 @@ build:
 
 run:
   cmd:
-    - python3 external/DCNv2/setup.py build develop
+    - source entrypoint-polyaxon.sh
     - python3 -W ignore train_polyaxon.py \
       --config {{config}} \
       --batch_size {{batch_size}}
