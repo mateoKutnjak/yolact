@@ -3,6 +3,7 @@ from math import sqrt
 import torch
 
 from polyaxon_client.tracking import get_data_paths
+from polyaxon_client.exceptions import PolyaxonClientException
 
 # for making bounding boxes pretty
 COLORS = ((244,  67,  54),
@@ -59,6 +60,12 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
 CUSTOM_COCO_CLASSES = ('valve', 'manometer', 'hole')
 
 CUSTOM_COCO_LABEL_MAP = {1: 1, 2: 2, 3: 3}
+
+polyaxon_data_root = ''
+try:
+    polyaxon_data_root = get_data_paths()['data1']
+except PolyaxonClientException:
+    pass
 
 
 
@@ -178,12 +185,15 @@ dataset_custom = dataset_base.copy({
 dataset_custom_polyaxon = dataset_base.copy({
     'name': 'Custom Dataset Polyaxon',
 
-    'train_images': get_data_paths()['data1'] + '/yolact/images/',
-    'train_info':   get_data_paths()['data1'] + '/yolact/train.json',
+    'train_images': polyaxon_data_root + '/yolact/images/',
+    'train_info':   polyaxon_data_root + '/yolact/train.json',
 
     # Validation images and annotations.
-    'valid_images': get_data_paths()['data1'] + '/yolact/images/',
-    'valid_info':   get_data_paths()['data1'] + '/yolact/valid.json'
+    'valid_images': polyaxon_data_root + '/yolact/images/',
+    'valid_info':   polyaxon_data_root + '/yolact/valid.json',
+
+    'class_names': CUSTOM_COCO_CLASSES,
+    'label_map': CUSTOM_COCO_LABEL_MAP
 })
 
 PASCAL_CLASSES = ("aeroplane", "bicycle", "bird", "boat", "bottle",
