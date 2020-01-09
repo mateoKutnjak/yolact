@@ -178,7 +178,7 @@ dataset_custom = dataset_base.copy({
 dataset_custom_polyaxon = dataset_base.copy({
     'name': 'Custom Dataset Polyaxon',
 
-    'train_images': get_data_paths()['data1'] + '/yolacqt/images/',
+    'train_images': get_data_paths()['data1'] + '/yolact/images/',
     'train_info':   get_data_paths()['data1'] + '/yolact/train.json',
 
     # Validation images and annotations.
