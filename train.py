@@ -168,6 +168,8 @@ class CustomDataParallel(nn.DataParallel):
         return out
 
 def train():
+    print(args)
+    print(cfg)
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)
 

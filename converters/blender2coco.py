@@ -79,7 +79,7 @@ def fill_holes(mask):
     return mask
 
 
-def create_example_annotation(args, id, subset, annotations, filename,
+def create_example_annotation(args, id, annotations, filename,
                               images_dir, category_name, category_id,
                               annotate_holes=False):
 
@@ -172,13 +172,13 @@ if __name__ == '__main__':
 
         for train_filename in train_filenames:
             cntr += 1
-            create_example_annotation(args, id=cntr, subset='train', annotations=train_annotations,
+            create_example_annotation(args, id=cntr, annotations=train_annotations,
                                       filename=train_filename, images_dir=images_dir,
                                       category_name=category_name, category_id=category_id)
 
             if category_name in ['valve']:
                 cntr += 1
-                create_example_annotation(args, id=cntr, subset='train', annotations=train_annotations,
+                create_example_annotation(args, id=cntr, annotations=train_annotations,
                                           filename=train_filename, images_dir=images_dir,
                                           category_name=category_name, category_id=category_id, annotate_holes=True)
 
@@ -187,13 +187,13 @@ if __name__ == '__main__':
 
         for valid_filename in valid_filenames:
             cntr += 1
-            create_example_annotation(args, id=cntr, subset='valid', annotations=valid_annotations,
+            create_example_annotation(args, id=cntr, annotations=valid_annotations,
                                       filename=valid_filename, images_dir=images_dir,
                                       category_name=category_name, category_id=category_id)
 
             if category_name in ['valve']:
                 cntr += 1
-                create_example_annotation(args, id=cntr, subset='valid', annotations=valid_annotations,
+                create_example_annotation(args, id=cntr, annotations=valid_annotations,
                                           filename=valid_filename, images_dir=images_dir,
                                           category_name=category_name, category_id=category_id, annotate_holes=True)
 
