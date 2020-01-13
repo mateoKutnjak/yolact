@@ -2,6 +2,9 @@ from backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackb
 from math import sqrt
 import torch
 
+from polyaxon_client.tracking import get_data_paths
+from polyaxon_client.exceptions import PolyaxonClientException
+
 # for making bounding boxes pretty
 COLORS = ((244,  67,  54),
           (233,  30,  99),
@@ -57,6 +60,12 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
 CUSTOM_COCO_CLASSES = ('valve', 'manometer', 'hole')
 
 CUSTOM_COCO_LABEL_MAP = {1: 1, 2: 2, 3: 3}
+
+polyaxon_data_root = ''
+try:
+    polyaxon_data_root = get_data_paths()['data1']
+except PolyaxonClientException:
+    pass
 
 
 
@@ -168,6 +177,20 @@ dataset_custom = dataset_base.copy({
     # Validation images and annotations.
     'valid_images': './data/coco/images/',
     'valid_info':   './data/coco/valid.json',
+
+    'class_names': CUSTOM_COCO_CLASSES,
+    'label_map': CUSTOM_COCO_LABEL_MAP
+})
+
+dataset_custom_polyaxon = dataset_base.copy({
+    'name': 'Custom Dataset Polyaxon',
+
+    'train_images': polyaxon_data_root + '/yolact/images/',
+    'train_info':   polyaxon_data_root + '/yolact/train.json',
+
+    # Validation images and annotations.
+    'valid_images': polyaxon_data_root + '/yolact/images/',
+    'valid_info':   polyaxon_data_root + '/yolact/valid.json',
 
     'class_names': CUSTOM_COCO_CLASSES,
     'label_map': CUSTOM_COCO_LABEL_MAP
@@ -813,6 +836,31 @@ custom_yolact_plus_101_config = yolact_base_config.copy({
     'name': 'yolact_plus_base',
     'dataset': dataset_custom,
     'num_classes': len(dataset_custom.class_names) + 1,
+
+    'backbone': resnet101_dcn_inter3_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+
+        'pred_aspect_ratios': [[[1, 1 / 2, 2]]] * 5,
+        'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': False,
+    }),
+
+    'use_maskiou': True,
+    'maskiou_net': [(8, 3, {'stride': 2}), (16, 3, {'stride': 2}), (32, 3, {'stride': 2}), (64, 3, {'stride': 2}),
+                    (128, 3, {'stride': 2})],
+    'maskiou_alpha': 25,
+    'rescore_bbox': False,
+    'rescore_mask': True,
+
+    'discard_mask_area': 2,
+})
+
+custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
+    'name': 'yolact_plus_base_polyaxon',
+    'dataset': dataset_custom_polyaxon,
+    'num_classes': len(dataset_custom_polyaxon.class_names) + 1,
 
     'backbone': resnet101_dcn_inter3_backbone.copy({
         'selected_layers': list(range(1, 4)),
