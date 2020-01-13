@@ -86,7 +86,7 @@ def create_example_annotation(args, id, subset, annotations, filename,
     example_num = filename.split('.')[0]
 
     annotations['images'].append({
-        'file_name': 'COCO_{}2019_{}-{}'.format(subset, category_name, filename),
+        'file_name': '{}-{}'.format(subset, category_name, filename),
         'height': args.img_height,
         'width': args.img_width,
         'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
@@ -94,7 +94,7 @@ def create_example_annotation(args, id, subset, annotations, filename,
 
     shutil.copy(
         os.path.join(args.src, category_name, 'rgb', filename),
-        os.path.join(images_dir, 'COCO_{}2019_{}-{}'.format(subset, category_name, filename))
+        os.path.join(images_dir, '{}-{}'.format(category_name, filename))
     )
 
     mask = imageio.imread(os.path.join(args.src, category_name, 'mask', filename))
