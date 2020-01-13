@@ -79,14 +79,14 @@ def fill_holes(mask):
     return mask
 
 
-def create_example_annotation(args, id, subset, annotations, filename,
+def create_example_annotation(args, id, annotations, filename,
                               images_dir, category_name, category_id,
                               annotate_holes=False):
 
     example_num = filename.split('.')[0]
 
     annotations['images'].append({
-        'file_name': 'COCO_{}2019_{}-{}'.format(subset, category_name, filename),
+        'file_name': '{}-{}'.format(category_name, filename),
         'height': args.img_height,
         'width': args.img_width,
         'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
@@ -94,7 +94,7 @@ def create_example_annotation(args, id, subset, annotations, filename,
 
     shutil.copy(
         os.path.join(args.src, category_name, 'rgb', filename),
-        os.path.join(images_dir, 'COCO_{}2019_{}-{}'.format(subset, category_name, filename))
+        os.path.join(images_dir, '{}-{}'.format(category_name, filename))
     )
 
     mask = imageio.imread(os.path.join(args.src, category_name, 'mask', filename))
@@ -172,13 +172,13 @@ if __name__ == '__main__':
 
         for train_filename in train_filenames:
             cntr += 1
-            create_example_annotation(args, id=cntr, subset='train', annotations=train_annotations,
+            create_example_annotation(args, id=cntr, annotations=train_annotations,
                                       filename=train_filename, images_dir=images_dir,
                                       category_name=category_name, category_id=category_id)
 
             if category_name in ['valve']:
                 cntr += 1
-                create_example_annotation(args, id=cntr, subset='train', annotations=train_annotations,
+                create_example_annotation(args, id=cntr, annotations=train_annotations,
                                           filename=train_filename, images_dir=images_dir,
                                           category_name=category_name, category_id=category_id, annotate_holes=True)
 
@@ -187,13 +187,13 @@ if __name__ == '__main__':
 
         for valid_filename in valid_filenames:
             cntr += 1
-            create_example_annotation(args, id=cntr, subset='valid', annotations=valid_annotations,
+            create_example_annotation(args, id=cntr, annotations=valid_annotations,
                                       filename=valid_filename, images_dir=images_dir,
                                       category_name=category_name, category_id=category_id)
 
             if category_name in ['valve']:
                 cntr += 1
-                create_example_annotation(args, id=cntr, subset='valid', annotations=valid_annotations,
+                create_example_annotation(args, id=cntr, annotations=valid_annotations,
                                           filename=valid_filename, images_dir=images_dir,
                                           category_name=category_name, category_id=category_id, annotate_holes=True)
 
