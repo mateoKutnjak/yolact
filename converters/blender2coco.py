@@ -86,7 +86,7 @@ def create_example_annotation(args, id, subset, annotations, filename,
     example_num = filename.split('.')[0]
 
     annotations['images'].append({
-        'file_name': '{}-{}'.format(subset, category_name, filename),
+        'file_name': '{}-{}'.format(category_name, filename),
         'height': args.img_height,
         'width': args.img_width,
         'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
