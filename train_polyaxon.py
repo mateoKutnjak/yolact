@@ -171,10 +171,6 @@ class CustomDataParallel(nn.DataParallel):
         return out
 
 def train():
-    print(args)
-    attrs = vars(cfg)
-    print(', '.join("%s: %s" % item for item in attrs.items()))
-
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)
 
