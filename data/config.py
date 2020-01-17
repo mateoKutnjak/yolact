@@ -2,8 +2,11 @@ from backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackb
 from math import sqrt
 import torch
 
-from polyaxon_client.tracking import get_data_paths
-from polyaxon_client.exceptions import PolyaxonClientException
+try:
+    from polyaxon_client.tracking import get_data_paths
+    from polyaxon_client.exceptions import PolyaxonClientException
+except ImportError:
+    pass
 
 # for making bounding boxes pretty
 COLORS = ((244,  67,  54),
@@ -64,7 +67,7 @@ CUSTOM_COCO_LABEL_MAP = {1: 1, 2: 2, 3: 3}
 polyaxon_data_root = ''
 try:
     polyaxon_data_root = get_data_paths()['data1']
-except PolyaxonClientException:
+except Exception:
     pass
 
 
