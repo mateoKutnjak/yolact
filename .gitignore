@@ -1,6 +1,7 @@
 # Custom added ignores (Gideon)
 **.json
 **.png
+.polyaxon/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
