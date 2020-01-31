@@ -4,6 +4,10 @@ import sys
 import torch
 import torch.utils.data as data
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
+import sys
+if '/opt/ros/kinetic/lib/python2.7/dist-packages' in sys.path:
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 import numpy as np
 from .config import cfg
