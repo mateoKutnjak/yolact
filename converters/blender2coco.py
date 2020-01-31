@@ -58,11 +58,14 @@ def get_contours(mask, holes=False):
 
 
 def filter_mask(mask, category_id):
-    if category_id not in [1, HOLE_CATEGORY_ID]:
-        return mask
+    if category_id != HOLE_CATEGORY_ID:
+        mask[mask != category_id] = 0
 
     ordered_contours = get_contours(mask, holes=category_id == HOLE_CATEGORY_ID)
 
+    # Hardcoded for valve holes:
+    #   Valve has largest contour of whole object and the rest of contours on mask
+    #   are contours of 3 or more holes.
     mask.fill(0)
     for contour, area in ordered_contours:
         cv2.fillPoly(mask, np.array([contour], dtype=np.int32), color=category_id)
@@ -119,6 +122,19 @@ def create_example_annotation(args, id, annotations, filename,
     #     plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
 
 
+def plot_coco_annotation(rgb_filename, annotation):
+    rgb = imageio.imread(rgb_filename)
+    bbox = list(map(int, annotation['bbox']))
+    rgb = cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), (255, 0, 0), 2)
+    plt.imshow(rgb)
+
+    for polygon in annotation['segmentation']:
+        plt.scatter(polygon[0::2], polygon[1::2], s=2)
+
+    plt.suptitle('ID={}, Category={}, Area={}'.format(annotation['id'], annotation['category_id'], annotation['area']), fontsize=20)
+    plt.show()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -127,21 +143,22 @@ if __name__ == '__main__':
     parser.add_argument('--img-width', type=int, default=1280)
     parser.add_argument('--img-height', type=int, default=720)
     parser.add_argument('--split', type=float, default=0.95)
-    args = parser.parse_args()
+    opt = parser.parse_args()
 
-    images_dir = os.path.join(args.dest, 'images')
-    annotations_dir = os.path.join(args.dest, 'annotations')
+    images_dir = os.path.join(opt.dest, 'images')
+    annotations_dir = os.path.join(opt.dest, 'annotations')
 
-    if not os.path.exists(args.dest):
-        os.makedirs(args.dest)
+    if not os.path.exists(opt.dest):
+        os.makedirs(opt.dest)
     if not os.path.exists(images_dir):
         os.makedirs(images_dir)
     if not os.path.exists(annotations_dir):
         os.makedirs(annotations_dir)
 
-    with open(os.path.join(args.src, 'objects_info.json'), 'r') as f:
+    with open(os.path.join(opt.src, 'objects_info.json'), 'r') as f:
         objects_info = json.load(f)['objects']
-    objects_info = sorted(objects_info.items(), key=operator.itemgetter(1))
+        objects_info = {int(k): v for k, v in objects_info.items()}
+    # objects_info = sorted(objects_info.items(), key=operator.itemgetter(1))
 
     global HOLE_CATEGORY_ID
     HOLE_CATEGORY_ID = len(objects_info) + 1
@@ -154,55 +171,45 @@ if __name__ == '__main__':
 
     print("{}: Conversion started".format(datetime.datetime.now()))
 
-    for category_name, category_id in objects_info:
-        train_annotations['categories'].append({
-            'id': category_id,
-            'name': category_name
-        })
-        valid_annotations['categories'].append({
-            'id': category_id,
-            'name': category_name
-        })
+    for k, v in objects_info.items():
+        category_data = {'id': v, 'name': k}
 
-        filenames = os.listdir(os.path.join(args.src, category_name, 'rgb'))
+        train_annotations['categories'].append(category_data)
+        valid_annotations['categories'].append(category_data)
+    train_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
+    valid_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
 
-        random.shuffle(filenames)
-        train_filenames = filenames[:int(len(filenames) * args.split)]
-        valid_filenames = filenames[int(len(filenames) * args.split):]
+    for base_path, obj_dirs, _ in os.walk(opt.src):
+        for obj_dir in obj_dirs:
+            obj_dir_abs = os.path.join(base_path, obj_dir)
 
-        for train_filename in train_filenames:
-            cntr += 1
-            create_example_annotation(args, id=cntr, annotations=train_annotations,
-                                      filename=train_filename, images_dir=images_dir,
-                                      category_name=category_name, category_id=category_id)
+            for filename in os.listdir(os.path.join(obj_dir_abs, 'mask')):
+                stripped_filename = filename.split('.')[0]
+                mode = 'train' if np.random.sample() < opt.split else 'valid'
 
-            if category_name in ['valve']:
-                cntr += 1
-                create_example_annotation(args, id=cntr, annotations=train_annotations,
-                                          filename=train_filename, images_dir=images_dir,
-                                          category_name=category_name, category_id=category_id, annotate_holes=True)
+                rgb = imageio.imread(os.path.join(obj_dir_abs, 'rgb', filename))
+                mask = imageio.imread(os.path.join(obj_dir_abs, 'mask', filename))
+                classes = list(map(int, np.unique(mask)))
 
-                if HOLE_ANNOTATION_CATEGORY not in train_annotations['categories']:
-                        train_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
+                if 0 in classes:
+                    classes.remove(0)
 
-        for valid_filename in valid_filenames:
-            cntr += 1
-            create_example_annotation(args, id=cntr, annotations=valid_annotations,
-                                      filename=valid_filename, images_dir=images_dir,
-                                      category_name=category_name, category_id=category_id)
+                for c in classes:
+                    cntr += 1
 
-            if category_name in ['valve']:
-                cntr += 1
-                create_example_annotation(args, id=cntr, annotations=valid_annotations,
-                                          filename=valid_filename, images_dir=images_dir,
-                                          category_name=category_name, category_id=category_id, annotate_holes=True)
+                    create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
+                                              annotations=train_annotations if mode == 'train' else valid_annotations,
+                                              category_name=obj_dir, category_id=c)
 
-                if HOLE_ANNOTATION_CATEGORY not in valid_annotations['categories']:
-                    valid_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
+                    if obj_dir in ['valve']:
+                        cntr += 1
+                        create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
+                                                  annotations=train_annotations if mode == 'train' else valid_annotations,
+                                                  category_name=obj_dir, category_id=c, annotate_holes=True)
+            print('{}: Object {} conversion finished'.format(datetime.datetime.now(), obj_dir))
+        break
+    print('{}: Writing to files...'.format(datetime.datetime.now()))
 
-        print('{}: Object {} conversion finished'.format(datetime.datetime.now(), category_name))
-
-    print('Writing to files...')
     with open(os.path.join(annotations_dir, 'train.json'), 'w') as train_json:
         json.dump(train_annotations, train_json)
     with open(os.path.join(annotations_dir, 'valid.json'), 'w') as valid_json:
