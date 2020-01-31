@@ -653,6 +653,10 @@ class MultiBoxLoss(nn.Module):
             losses['D'] = loss_d
 
         if cfg.use_maskiou:
+
+            if len(maskiou_t_list) == 0:
+                return losses, None
+
             maskiou_t = torch.cat(maskiou_t_list)
             label_t = torch.cat(label_t_list)
             maskiou_net_input = torch.cat(maskiou_net_input_list)
