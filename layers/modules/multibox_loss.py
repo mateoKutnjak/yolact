@@ -184,7 +184,7 @@ class MultiBoxLoss(nn.Module):
                 losses['C'] = self.ohem_conf_loss(conf_data, conf_t, pos, batch_size)
 
         # Mask IoU Loss
-        if cfg.use_maskiou:
+        if cfg.use_maskiou and maskiou_targets is not None:
             losses['I'] = self.mask_iou_loss(net, maskiou_targets)
 
         # These losses also don't depend on anchors
