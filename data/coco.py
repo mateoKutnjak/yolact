@@ -112,6 +112,9 @@ class COCODetection(data.Dataset):
         """
         img_id = self.ids[index]
 
+        import pdb
+        pdb.set_trace()
+
         if self.has_gt:
             target = self.coco.imgToAnns[img_id]
             ann_ids = self.coco.getAnnIds(imgIds=img_id)

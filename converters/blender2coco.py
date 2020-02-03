@@ -84,7 +84,7 @@ def fill_holes(mask):
 
 def create_example_annotation(args, id, annotations, filename,
                               images_dir, category_name, category_id,
-                              annotate_holes=False):
+                              annotate_holes=False, dir_index=None):
 
     example_num = filename.split('.')[0]
 
@@ -92,7 +92,9 @@ def create_example_annotation(args, id, annotations, filename,
         'file_name': '{}-{}'.format(category_name, filename),
         'height': args.img_height,
         'width': args.img_width,
-        'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
+        # Unnecessary doubling of image indices
+        'id': dir_index * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
+
     })
 
     shutil.copy(
@@ -108,7 +110,7 @@ def create_example_annotation(args, id, annotations, filename,
     annotations['annotations'].append({
         'id': id,
         'category_id': category_id if not annotate_holes else HOLE_CATEGORY_ID,
-        'image_id': category_id * 100000 + int(example_num),
+        'image_id': dir_index * 100000 + int(example_num),
         'iscrowd': 0,
         'bbox': pycocotools.mask.toBbox(rle_mask).tolist(),
         'area': pycocotools.mask.area(rle_mask).tolist()
@@ -179,8 +181,11 @@ if __name__ == '__main__':
     train_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
     valid_annotations['categories'].append(HOLE_ANNOTATION_CATEGORY)
 
+    obj_dir_ctr = 0
+
     for base_path, obj_dirs, _ in os.walk(opt.src):
         for obj_dir in obj_dirs:
+            obj_dir_ctr += 1
             obj_dir_abs = os.path.join(base_path, obj_dir)
 
             for filename in os.listdir(os.path.join(obj_dir_abs, 'mask')):
@@ -199,13 +204,13 @@ if __name__ == '__main__':
 
                     create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
                                               annotations=train_annotations if mode == 'train' else valid_annotations,
-                                              category_name=obj_dir, category_id=c)
+                                              category_name=obj_dir, category_id=c, dir_index=obj_dir_ctr)
 
                     if obj_dir in ['valve']:
                         cntr += 1
                         create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
                                                   annotations=train_annotations if mode == 'train' else valid_annotations,
-                                                  category_name=obj_dir, category_id=c, annotate_holes=True)
+                                                  category_name=obj_dir, category_id=c, annotate_holes=True, dir_index=obj_dir_ctr)
             print('{}: Object {} conversion finished'.format(datetime.datetime.now(), obj_dir))
         break
     print('{}: Writing to files...'.format(datetime.datetime.now()))
