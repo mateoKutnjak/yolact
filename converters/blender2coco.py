@@ -121,7 +121,8 @@ def create_example_annotation(args, id, annotations, filename,
     # if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3]:
     #     import pdb
     #     pdb.set_trace()
-    #     plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
+    # if dir_index != 1:
+    plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
 
 
 def plot_coco_annotation(rgb_filename, annotation):
