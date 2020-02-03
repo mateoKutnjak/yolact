@@ -589,7 +589,7 @@ coco_base_config = Config({
     'semantic_segmentation_alpha': 1,
 
     # Adds another branch to the netwok to predict Mask IoU.
-    'use_mask_scoring': False,
+    'use_mask_scoring': True,
     'mask_scoring_alpha': 1,
 
     # Match gt boxes using the Box2Pix change metric instead of the standard IoU metric.
@@ -882,7 +882,7 @@ custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
     'rescore_bbox': False,
     'rescore_mask': True,
 
-    'discard_mask_area': 2,
+    'discard_mask_area': -1,
 })
 
 yolact_plus_resnet50_config = yolact_plus_base_config.copy({
