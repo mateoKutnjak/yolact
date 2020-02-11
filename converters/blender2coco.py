@@ -93,7 +93,7 @@ def create_example_annotation(args, id, annotations, filename,
         'height': args.img_height,
         'width': args.img_width,
         # Unnecessary doubling of image indices
-        'id': dir_index * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
+        'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
 
     })
 
@@ -110,7 +110,7 @@ def create_example_annotation(args, id, annotations, filename,
     annotations['annotations'].append({
         'id': id,
         'category_id': category_id if not annotate_holes else HOLE_CATEGORY_ID,
-        'image_id': dir_index * 100000 + int(example_num),
+        'image_id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num),
         'iscrowd': 0,
         'bbox': pycocotools.mask.toBbox(rle_mask).tolist(),
         'area': pycocotools.mask.area(rle_mask).tolist()
@@ -122,7 +122,7 @@ def create_example_annotation(args, id, annotations, filename,
     #     import pdb
     #     pdb.set_trace()
     # if dir_index != 1:
-    plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
+    #     plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
 
 
 def plot_coco_annotation(rgb_filename, annotation):
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
     with open(os.path.join(opt.src, 'objects_info.json'), 'r') as f:
         objects_info = json.load(f)['objects']
-        objects_info = {int(k): v for k, v in objects_info.items()}
+        # objects_info = {int(v): k for k, v in objects_info.items()}
     # objects_info = sorted(objects_info.items(), key=operator.itemgetter(1))
 
     global HOLE_CATEGORY_ID

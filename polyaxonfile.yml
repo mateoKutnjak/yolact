@@ -42,7 +42,7 @@ inputs:
 
 environment:
   node_selector:
-    polyaxon: ali
+    polyaxon: lennox
   resources:
     gpu:
       requests: 1

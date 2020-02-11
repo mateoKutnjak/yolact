@@ -882,7 +882,7 @@ custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
     'rescore_bbox': False,
     'rescore_mask': True,
 
-    'discard_mask_area': -1,
+    'discard_mask_area': 2,
 })
 
 yolact_plus_resnet50_config = yolact_plus_base_config.copy({
