@@ -1,4 +1,5 @@
 import json
+import sys
 import imageio
 import matplotlib.pyplot as plt
 import cv2
@@ -25,18 +26,18 @@ def plot_polygon(mask, polygons):
     plt.show()
 
 
-with open('data/coco/valid.json', 'r') as f:
+with open(sys.argv[1], 'r') as f:
     valid = json.load(f)
 
 for ann in valid['annotations']:
-    if random.random() < 0.1:
+    if random.random() < 0.02:
 
         ann_images = search_images_by_id(ann['image_id'])
         ann_category = search_categories_by_id(ann['category_id'])
 
         bbox = list(map(int, ann['bbox']))
 
-        rgb = imageio.imread('data/coco/images/' + str(ann_images['file_name']))
+        rgb = imageio.imread(sys.argv[1] + '/../../images/' + str(ann_images['file_name']))
         rgb = cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), (255, 0, 0), 5)
         plot_polygon(rgb, ann['segmentation'])
 

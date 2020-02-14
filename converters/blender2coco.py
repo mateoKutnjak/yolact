@@ -18,12 +18,22 @@ sys.path.append(os.getcwd())
 HOLE_CATEGORY_ID = -1
 
 
-def plot_polygon(mask, polygons):
-    plt.imshow(mask)
+def plot_polygon(rgb, mask, annotation):
+    f, ax = plt.subplots(1, 2)
 
-    for polygon in polygons:
-        plt.scatter(polygon[0::2], polygon[1::2], s=2)
+    ax[0].imshow(rgb)
+    ax[1].imshow(mask)
+
+    ax[0].set_title(str(annotation['category_id']))
+    ax[1].set_title(str(annotation['category_id']))
+
+    for polygon in annotation['segmentation']:
+        ax[0].scatter(polygon[0::2], polygon[1::2], s=2)
+        ax[1].scatter(polygon[0::2], polygon[1::2], s=2)
     plt.show()
+
+    import pdb
+    pdb.set_trace()
 
 
 """
@@ -84,7 +94,7 @@ def fill_holes(mask):
 
 def create_example_annotation(args, id, annotations, filename,
                               images_dir, category_name, category_id,
-                              annotate_holes=False, dir_index=None):
+                              annotate_holes=False, dir_index=None, rgb=None):
 
     example_num = filename.split('.')[0]
 
@@ -93,7 +103,7 @@ def create_example_annotation(args, id, annotations, filename,
         'height': args.img_height,
         'width': args.img_width,
         # Unnecessary doubling of image indices
-        'id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
+        'id': dir_index * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
 
     })
 
@@ -110,7 +120,7 @@ def create_example_annotation(args, id, annotations, filename,
     annotations['annotations'].append({
         'id': id,
         'category_id': category_id if not annotate_holes else HOLE_CATEGORY_ID,
-        'image_id': category_id * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num),
+        'image_id': dir_index * 100000 + int(example_num),
         'iscrowd': 0,
         'bbox': pycocotools.mask.toBbox(rle_mask).tolist(),
         'area': pycocotools.mask.area(rle_mask).tolist()
@@ -122,7 +132,7 @@ def create_example_annotation(args, id, annotations, filename,
     #     import pdb
     #     pdb.set_trace()
     # if dir_index != 1:
-    #     plot_polygon(mask, polygons=annotations['annotations'][-1]['segmentation'])
+    #     plot_polygon(rgb, mask, annotation=annotations['annotations'][-1])
 
 
 def plot_coco_annotation(rgb_filename, annotation):
@@ -160,7 +170,7 @@ if __name__ == '__main__':
 
     with open(os.path.join(opt.src, 'objects_info.json'), 'r') as f:
         objects_info = json.load(f)['objects']
-        # objects_info = {int(v): k for k, v in objects_info.items()}
+        objects_info = {int(v): k for k, v in objects_info.items()}
     # objects_info = sorted(objects_info.items(), key=operator.itemgetter(1))
 
     global HOLE_CATEGORY_ID
@@ -175,7 +185,7 @@ if __name__ == '__main__':
     print("{}: Conversion started".format(datetime.datetime.now()))
 
     for k, v in objects_info.items():
-        category_data = {'id': v, 'name': k}
+        category_data = {'id': k, 'name': v}
 
         train_annotations['categories'].append(category_data)
         valid_annotations['categories'].append(category_data)
@@ -205,13 +215,13 @@ if __name__ == '__main__':
 
                     create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
                                               annotations=train_annotations if mode == 'train' else valid_annotations,
-                                              category_name=obj_dir, category_id=c, dir_index=obj_dir_ctr)
+                                              category_name=obj_dir, category_id=c, dir_index=obj_dir_ctr, rgb=rgb)
 
                     if obj_dir in ['valve']:
                         cntr += 1
                         create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
                                                   annotations=train_annotations if mode == 'train' else valid_annotations,
-                                                  category_name=obj_dir, category_id=c, annotate_holes=True, dir_index=obj_dir_ctr)
+                                                  category_name=obj_dir, category_id=c, annotate_holes=True, dir_index=obj_dir_ctr, rgb=rgb)
             print('{}: Object {} conversion finished'.format(datetime.datetime.now(), obj_dir))
         break
     print('{}: Writing to files...'.format(datetime.datetime.now()))
