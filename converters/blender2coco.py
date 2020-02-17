@@ -120,7 +120,7 @@ def create_example_annotation(args, id, annotations, filename,
     annotations['annotations'].append({
         'id': id,
         'category_id': category_id if not annotate_holes else HOLE_CATEGORY_ID,
-        'image_id': dir_index * 100000 + int(example_num),
+        'image_id': dir_index * 100000 + int(example_num) if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num),
         'iscrowd': 0,
         'bbox': pycocotools.mask.toBbox(rle_mask).tolist(),
         'area': pycocotools.mask.area(rle_mask).tolist()
@@ -131,8 +131,8 @@ def create_example_annotation(args, id, annotations, filename,
     # if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3]:
     #     import pdb
     #     pdb.set_trace()
-    # if dir_index != 1:
-    #     plot_polygon(rgb, mask, annotation=annotations['annotations'][-1])
+    if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3] and annotate_holes:
+        plot_polygon(rgb, mask, annotation=annotations['annotations'][-1])
 
 
 def plot_coco_annotation(rgb_filename, annotation):
