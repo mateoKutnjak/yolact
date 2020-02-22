@@ -302,12 +302,13 @@ def train():
                 optimizer.zero_grad()
 
                 # Forward Pass + Compute loss at the same time (see CustomDataParallel and NetLoss)
-
+                # import pdb;pdb.set_trace()
+                #
                 # import matplotlib.pyplot as plt
                 # f, ax = plt.subplots(len(datum[1][1]), 2)
                 # for b in range(len(datum[1][1])):
                 #     ax[b, 0].imshow(datum[0][b][0])
-                #     ax[b, 1].imshow(datum[1][1][b][0])
+                #     ax[b, 1].imshow(datum[1][1][b][-1])
                 # plt.show()
                 #
                 # print(datum[1][0])

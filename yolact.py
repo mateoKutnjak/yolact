@@ -225,7 +225,7 @@ class PredictionModule(nn.Module):
                     # +0.5 because priors are in center-size notation
                     x = (i + 0.5) / conv_w
                     y = (j + 0.5) / conv_h
-                    
+
                     for ars in self.aspect_ratios:
                         for scale in self.scales:
                             for ar in ars:

@@ -30,7 +30,7 @@ with open(sys.argv[1], 'r') as f:
     valid = json.load(f)
 
 for ann in valid['annotations']:
-    if random.random() < 0.02:
+    if random.random() < 0.005:
 
         ann_images = search_images_by_id(ann['image_id'])
         ann_category = search_categories_by_id(ann['category_id'])
