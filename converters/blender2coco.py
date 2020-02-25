@@ -92,9 +92,40 @@ def fill_holes(mask):
     return mask
 
 
+def resize(rgb, mask, w, h):
+
+    original_h = rgb.shape[0]
+    original_w = rgb.shape[1]
+
+    percent_decrease_w = w/rgb.shape[1]
+    percent_decrease_h = h/rgb.shape[0]
+
+    min_decrease = min(percent_decrease_h, percent_decrease_w)
+
+    new_w = round(original_w*min_decrease / 2)*2
+    new_h = round(original_h*min_decrease / 2)*2
+
+    rgb = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    mask = cv2.resize(mask, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+    vertical_pad = max(0, h-new_h) // 2
+    horizontal_pad = max(0, w-new_w) // 2
+
+    rgb = np.pad(rgb, ((vertical_pad, vertical_pad), (horizontal_pad, horizontal_pad), (0, 0)),
+                 mode='constant', constant_values=0)
+    mask = np.pad(mask, ((vertical_pad, vertical_pad), (horizontal_pad, horizontal_pad)),
+                 mode='constant', constant_values=0)
+    return rgb, mask
+
 def create_example_annotation(args, id, annotations, filename,
                               images_dir, category_name, category_id,
                               annotate_holes=False, dir_index=None, rgb=None, classes=None):
+
+    mask = imageio.imread(os.path.join(args.src, category_name, 'mask', filename))
+
+    if rgb.shape[0] != args.img_height or \
+        rgb.shape[1] != args.img_height:
+        rgb, mask = resize(rgb, mask, w=args.img_width, h=args.img_height)
 
     example_num = filename.split('.')[0]
 
@@ -107,12 +138,13 @@ def create_example_annotation(args, id, annotations, filename,
             'id': dir_index * 100000 + int(example_num) # if not annotate_holes else HOLE_CATEGORY_ID * 100000 + int(example_num)
         })
 
-    shutil.copy(
-        os.path.join(args.src, category_name, 'rgb', filename),
-        os.path.join(images_dir, '{}-{}'.format(category_name, filename))
-    )
+    # shutil.copy(
+    #     os.path.join(args.src, category_name, 'rgb', filename),
+    #     os.path.join(images_dir, '{}-{}'.format(category_name, filename))
+    # )
 
-    mask = imageio.imread(os.path.join(args.src, category_name, 'mask', filename))
+    imageio.imwrite(os.path.join(images_dir, '{}-{}'.format(category_name, filename)), rgb)
+
     mask = filter_mask(mask, category_id)
 
     rle_mask = pycocotools.mask.encode(np.asfortranarray(mask.astype(np.uint8)))
@@ -131,8 +163,8 @@ def create_example_annotation(args, id, annotations, filename,
     # if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3]:
     #     import pdb
     #     pdb.set_trace()
-    if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3] and annotate_holes:
-        plot_polygon(rgb, mask, annotation=annotations['annotations'][-1])
+    # if annotations['annotations'][-1]['segmentation'].__len__() not in [1, 3] and annotate_holes:
+    #    plot_polygon(rgb, mask, annotation=annotations['annotations'][-1])
 
 
 def plot_coco_annotation(rgb_filename, annotation):
@@ -215,6 +247,7 @@ if __name__ == '__main__':
 
                 for c in classes:
                     cntr += 1
+                    print(cntr)
 
                     create_example_annotation(opt, id=cntr, filename=filename, images_dir=images_dir,
                                               annotations=train_annotations if mode == 'train' else valid_annotations,
