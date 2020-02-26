@@ -70,6 +70,12 @@ def get_contours(mask, holes=False):
 def filter_mask(mask, category_id):
     if category_id != HOLE_CATEGORY_ID:
         mask[mask != category_id] = 0
+        if category_id == 3:
+            mask = cv2.dilate(mask, np.ones((5,5), np.uint8), iterations=1)
+            # f, ax = plt.subplots(1, 2)
+            # ax[0].imshow(mask)
+            # ax[1].imshow(_mask)
+            # plt.show()
 
     ordered_contours = get_contours(mask, holes=category_id == HOLE_CATEGORY_ID)
 
