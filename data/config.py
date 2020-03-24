@@ -625,7 +625,7 @@ coco_base_config = Config({
     'mask_dim': None,
 
     # Input image size.
-    'max_size': 300,
+    'max_size': 550,
     
     # Whether or not to do post processing on the cpu at test time
     'force_cpu_nms': True,
@@ -677,7 +677,7 @@ coco_base_config = Config({
     # Inspried by Mask Scoring R-CNN (https://arxiv.org/abs/1903.00241)
     # Do not crop out the mask with bbox but slide a convnet on the image-size mask,
     # then use global pooling to get the final mask score
-    'use_maskiou': False,
+    'use_maskiou': True,
     
     # Archecture for the mask iou network. A (num_classes-1, 1, {}) layer is appended to the end.
     'maskiou_net': [],
@@ -857,7 +857,7 @@ custom_yolact_plus_101_config = yolact_base_config.copy({
     'rescore_bbox': False,
     'rescore_mask': True,
 
-    'discard_mask_area': 2,
+    'discard_mask_area': -1,
 })
 
 custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
@@ -882,7 +882,7 @@ custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
     'rescore_bbox': False,
     'rescore_mask': True,
 
-    'discard_mask_area': 2,
+    'discard_mask_area': -1,
 })
 
 yolact_plus_resnet50_config = yolact_plus_base_config.copy({

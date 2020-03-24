@@ -226,8 +226,6 @@ class PredictionModule(nn.Module):
                     x = (i + 0.5) / conv_w
                     y = (j + 0.5) / conv_h
 
-                    print(self.aspect_ratios)
-                    
                     for ars in self.aspect_ratios:
                         for scale in self.scales:
                             for ar in ars:

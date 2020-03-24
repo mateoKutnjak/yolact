@@ -19,10 +19,14 @@ inputs:
     is_optional: true
     default: "custom_yolact_plus_101_config_polyaxon"
     type: str
-#  - name: save_interval
+  - name: save_interval
+    is_optional: true
+    default: 10000
+    type: int
+#  - name: resume
 #    is_optional: true
-#    default: 1000
-#    type: int
+#    default: ''
+#    type: str
 #  - name: lr
 #    is_optional: true
 #    default: 0.001
@@ -56,4 +60,6 @@ run:
     - source entrypoint-polyaxon.sh
     - python3 -W ignore train_polyaxon.py \
       --config {{config}} \
-      --batch_size {{batch_size}}
+      --batch_size {{batch_size}} \
+      --save_interval {{save_interval}}
+      # --resume {{resume}}
