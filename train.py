@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from data import *
 from utils.augmentations import SSDAugmentation, BaseTransform
 from utils.functions import MovingAverage, SavePath

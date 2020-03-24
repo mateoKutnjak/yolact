@@ -111,7 +111,7 @@ class Config(object):
         for key, val in new_config_dict.items():
             self.__setattr__(key, val)
     
-    def print(self):
+    def _print(self):
         for k, v in vars(self).items():
             print(k, ' = ', v)
 
@@ -819,7 +819,7 @@ yolact_plus_base_config = yolact_base_config.copy({
     'backbone': resnet101_dcn_inter3_backbone.copy({
         'selected_layers': list(range(1, 4)),
         
-        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_aspect_ratios': [ [[1, 0.5, 2]] ]*5,
         'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
         'use_pixel_scales': True,
         'preapply_sqrt': False,
@@ -843,7 +843,7 @@ custom_yolact_plus_101_config = yolact_base_config.copy({
     'backbone': resnet101_dcn_inter3_backbone.copy({
         'selected_layers': list(range(1, 4)),
 
-        'pred_aspect_ratios': [[[1, 1 / 2, 2]]] * 5,
+        'pred_aspect_ratios': [[[1, 0.5, 2]]] * 5,
         'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
         'use_pixel_scales': True,
         'preapply_sqrt': False,
@@ -868,7 +868,7 @@ custom_yolact_plus_101_config_polyaxon = yolact_base_config.copy({
     'backbone': resnet101_dcn_inter3_backbone.copy({
         'selected_layers': list(range(1, 4)),
 
-        'pred_aspect_ratios': [[[1, 1 / 2, 2]]] * 5,
+        'pred_aspect_ratios': [[[1, 0.5, 2]]] * 5,
         'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
         'use_pixel_scales': True,
         'preapply_sqrt': False,
@@ -891,7 +891,7 @@ yolact_plus_resnet50_config = yolact_plus_base_config.copy({
     'backbone': resnet50_dcnv2_backbone.copy({
         'selected_layers': list(range(1, 4)),
         
-        'pred_aspect_ratios': [ [[1, 1/2, 2]] ]*5,
+        'pred_aspect_ratios': [ [[1, 0.5, 2]] ]*5,
         'pred_scales': [[i * 2 ** (j / 3.0) for j in range(3)] for i in [24, 48, 96, 192, 384]],
         'use_pixel_scales': True,
         'preapply_sqrt': False,

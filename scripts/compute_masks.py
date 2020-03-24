@@ -20,33 +20,33 @@ def mask_iou(mask1, mask2):
     return intersection / union
 
 def paint_mask(img_numpy, mask, color):
-	h, w, _ = img_numpy.shape
-	img_numpy = img_numpy.copy()
+    h, w, _ = img_numpy.shape
+    img_numpy = img_numpy.copy()
 
-	mask = np.tile(mask.reshape(h, w, 1), (1, 1, 3))
-	color_np = np.array(color[:3]).reshape(1, 1, 3)
-	color_np = np.tile(color_np, (h, w, 1))
-	mask_color = mask * color_np
+    mask = np.tile(mask.reshape(h, w, 1), (1, 1, 3))
+    color_np = np.array(color[:3]).reshape(1, 1, 3)
+    color_np = np.tile(color_np, (h, w, 1))
+    mask_color = mask * color_np
 
-	mask_alpha = 0.3
+    mask_alpha = 0.3
 
-	# Blend image and mask
-	image_crop = img_numpy * mask
-	img_numpy *= (1-mask)
-	img_numpy += image_crop * (1-mask_alpha) + mask_color * mask_alpha
+    # Blend image and mask
+    image_crop = img_numpy * mask
+    img_numpy *= (1-mask)
+    img_numpy += image_crop * (1-mask_alpha) + mask_color * mask_alpha
 
-	return img_numpy
+    return img_numpy
 
 # Inverse sigmoid
 def logit(x):
-	return np.log(x / (1-x + 0.0001) + 0.0001)
+    return np.log(x / (1-x + 0.0001) + 0.0001)
 
 def sigmoid(x):
-	return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
 img_fmt = '../data/coco/images/%012d.jpg'
 with open('info.txt', 'r') as f:
-	img_id = int(f.read())
+    img_id = int(f.read())
 
 img = plt.imread(img_fmt % img_id).astype(np.float32)
 h, w, _ = img.shape
@@ -79,14 +79,14 @@ print(ious)
 gt_img = img.copy()
 
 for i in range(num_gt):
-	gt_img = paint_mask(gt_img, gt_masks[:, :, i], COLORS[i % len(COLORS)])
-	
+    gt_img = paint_mask(gt_img, gt_masks[:, :, i], COLORS[i % len(COLORS)])
+
 plt.imshow(gt_img / 255)
 plt.title('GT')
 plt.show()
 
 for i in range(num_gt):
-	img = paint_mask(img, approximated_masks[:, :, i], COLORS[i % len(COLORS)])
+    img = paint_mask(img, approximated_masks[:, :, i], COLORS[i % len(COLORS)])
 
 plt.imshow(img / 255)
 plt.title('Approximated')

@@ -225,6 +225,8 @@ class PredictionModule(nn.Module):
                     # +0.5 because priors are in center-size notation
                     x = (i + 0.5) / conv_w
                     y = (j + 0.5) / conv_h
+
+                    print(self.aspect_ratios)
                     
                     for ars in self.aspect_ratios:
                         for scale in self.scales:
@@ -307,7 +309,7 @@ class FPN(ScriptModuleWrapper):
         self.relu_downsample_layers = cfg.fpn.relu_downsample_layers
         self.relu_pred_layers       = cfg.fpn.relu_pred_layers
 
-    @script_method_wrapper
+    # @script_method_wrapper
     def forward(self, convouts:List[torch.Tensor]):
         """
         Args:

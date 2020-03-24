@@ -6,6 +6,19 @@ from collections import deque
 from pathlib import Path
 from layers.interpolate import InterpolateModule
 
+
+class Concat(nn.Module):
+    def __init__(self, nets, extra_params):
+        super().__init__()
+
+        self.nets = nn.ModuleList(nets)
+        self.extra_params = extra_params
+    
+    def forward(self, x):
+        # Concat each along the channel dimension
+        return torch.cat([net(x) for net in self.nets], dim=1, **self.extra_params)
+
+
 class MovingAverage():
     """ Keeps an average window of the specified number of items. """
 

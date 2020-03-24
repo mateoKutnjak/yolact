@@ -5,6 +5,7 @@ the specified number of anchor boxes.
 
 Run this script from the Yolact root directory.
 """
+from __future__ import print_function
 
 import pickle
 import random
